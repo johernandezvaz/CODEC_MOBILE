@@ -1,16 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'qr_screen.dart';
+import 'package:qr_code_reader/screens/home_screen.dart'; // Importa la nueva pantalla que creaste
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  LoginScreen({super.key});
+  bool _showUsernameError = false;
+  bool _showPasswordError = false;
 
   Future<void> _login(BuildContext context) async {
     final email = _usernameController.text.trim();
     final password = _passwordController.text.trim();
+
+    // Validar si los campos están vacíos
+    setState(() {
+      _showUsernameError = email.isEmpty;
+      _showPasswordError = password.isEmpty;
+    });
+
+    if (_showUsernameError || _showPasswordError) {
+      return;
+    }
 
     try {
       final response = await Supabase.instance.client
@@ -19,7 +36,6 @@ class LoginScreen extends StatelessWidget {
           .eq('usuario', email)
           .single();
 
-      // Añadir mensajes de depuración
       print('Response from Supabase: $response');
 
       final dbPassword = response['contrasena'];
@@ -28,46 +44,56 @@ class LoginScreen extends StatelessWidget {
         if (!context.mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const QRScreen()),
+          MaterialPageRoute(
+              builder: (context) => HomeScreen()), // Cambiado a HomeScreen
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.red,
-            content: Text('Usuario o contraseña incorrectos'),
-          ),
-        );
+        _showError(context, 'Usuario o contraseña incorrectos');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Error al iniciar sesión'),
-        ),
-      );
-
-      // Añadir mensaje de error para depuración
+      _showError(context, 'Error al iniciar sesión');
       print('Error during login: ${e.toString()}');
     }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(message),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inicio de Sesión'),
-      ),
+      backgroundColor: const Color(0xFFF4F5F7), // Fondo ligeramente gris
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Image.asset(
-              'assets/logos.png', // Asegúrate de tener el archivo logos.png en la carpeta assets
-              height: 150,
+            const Text(
+              'CODEC',
+              style: TextStyle(
+                fontFamily: 'Clashdisplay',
+                fontSize: 36,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 70),
+            const Text(
+              'Iniciar Sesión',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(
@@ -76,9 +102,12 @@ class LoginScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                  borderSide: const BorderSide(color: Colors.black, width: 2.0),
                   borderRadius: BorderRadius.circular(10),
                 ),
+                errorText: _showUsernameError
+                    ? 'El usuario no puede estar vacío'
+                    : null,
               ),
             ),
             const SizedBox(height: 10),
@@ -91,25 +120,53 @@ class LoginScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                  borderSide: const BorderSide(color: Colors.black, width: 2.0),
                   borderRadius: BorderRadius.circular(10),
                 ),
+                errorText: _showPasswordError
+                    ? 'La contraseña no puede estar vacía'
+                    : null,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () => _login(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // Color azul para el botón
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                textStyle: const TextStyle(fontSize: 18),
+                padding: EdgeInsets.zero, // Remueve el padding por defecto
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                elevation: 10, // Añade elevación para la sombra (similar al 3D)
+                shadowColor:
+                    Colors.black.withOpacity(0.5), // Color de la sombra
               ),
-              child: const Text(
-                'Iniciar Sesión',
-                style: TextStyle(color: Colors.white),
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF354E57),
+                      Color(0xFF405E69),
+                      Color(0xFF73A9BD),
+                    ],
+                    stops: [0.10, 0.63, 1.0], // Porcentajes del degradado
+                    begin: Alignment.topCenter, // Punto inicial (arriba)
+                    end: Alignment.bottomCenter, // Punto final (abajo)
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Continuar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Clashdisplay',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart'; // Importa la pantalla de apertura
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +21,10 @@ class MyApp extends StatelessWidget {
       title: 'Lector QR CODEC',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily:
+            'Clashdisplay', // Asegúrate de que la fuente esté disponible en todo el app
       ),
-      home: LoginScreen(),
+      home: SplashScreen(), // Aquí es donde llamas a la pantalla de apertura
     );
   }
 }

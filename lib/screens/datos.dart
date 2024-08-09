@@ -180,95 +180,175 @@ class _DatosScreenState extends State<DatosScreen> {
   @override
   Widget build(BuildContext context) {
     List<String> dataItems = widget.qrData.split(',');
+    Color backgroundColor;
+    String? message;
+    Color textColor = Colors.white;
+
+    if (ingreso == null) {
+      backgroundColor = const Color(0xFF441E1E);
+      message = 'Usuario no está registrado en la base de datos';
+      textColor = const Color(0xFFC40C0C);
+    } else if (!ingreso!) {
+      backgroundColor = const Color(0xFF1E3A44); // Azul oscuro
+      message = null;
+      textColor = Colors.white;
+    } else {
+      backgroundColor = const Color(0xE01A4D2E); // Verde oscuro
+      message = 'Usuario ya ha ingresado al evento';
+      textColor = const Color(0xE01A4D2E);
+    }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Datos del QR'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const Text(
-              'Datos escaneados:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Expanded(
-              child: ListView.builder(
-                itemCount: dataItems.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: const Icon(Icons.circle, size: 10),
-                    title: Text(dataItems[index].trim(),
-                        style: const TextStyle(fontSize: 16)),
-                  );
-                },
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+        children: <Widget>[
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'CODEC',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 20),
-            if (!verificado)
-              const Center(child: CircularProgressIndicator())
-            else
-              Column(
-                children: [
-                  Center(
+          ),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Ajusta el tamaño al contenido
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black
+                              .withOpacity(0.5), // Sombra similar al botón
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (ingreso != null && !ingreso!)
-                          Column(
-                            children: [
-                              const Text(
-                                'El usuario está registrado pero no ha ingresado',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        for (var i = 0; i < dataItems.length; i++) ...[
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: dataItems[i].split(':').first.trim() +
+                                      ': ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Clashdisplay',
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 100),
-                              ElevatedButton(
-                                onPressed: registrarIngreso,
-                                child: const Text('Registrar Ingreso'),
-                              ),
-                            ],
-                          ),
-                        if (ingreso != null && ingreso!)
-                          const Text(
-                            'El usuario ya ha ingresado al evento',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                                TextSpan(
+                                  text: dataItems[i].split(':').last.trim(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontFamily: 'Clashdisplay',
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        if (ingreso == null)
-                          const Text(
-                            'No existe este usuario en la base de datos',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
-                        if (errorMessage.isNotEmpty)
-                          Text(
-                            errorMessage,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
+                          if (i < dataItems.length - 1)
+                            const SizedBox(
+                                height:
+                                    25), // Añade más espacio entre elementos
+                        ],
                       ],
                     ),
                   ),
+                  if (message != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(
+                        message,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  if (ingreso != null && !ingreso!)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 100),
+                      child: Container(
+                        width: null, // Elimina el ancho por defecto
+                        constraints: BoxConstraints(
+                          maxWidth:
+                              200, // Ajusta el ancho máximo según tus necesidades
+                        ),
+                        child: ElevatedButton(
+                          onPressed: registrarIngreso,
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets
+                                .zero, // Remueve el padding por defecto
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation:
+                                10, // Añade elevación para la sombra (similar al 3D)
+                            shadowColor: Colors.black
+                                .withOpacity(0.5), // Color de la sombra
+                          ),
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF354E57),
+                                  Color(0xFF405E69),
+                                  Color(0xFF73A9BD),
+                                ],
+                                stops: [
+                                  0.10,
+                                  0.63,
+                                  1.0
+                                ], // Porcentajes del degradado
+                                begin: Alignment
+                                    .topCenter, // Punto inicial (arriba)
+                                end: Alignment
+                                    .bottomCenter, // Punto final (abajo)
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'Registrar Ingreso',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

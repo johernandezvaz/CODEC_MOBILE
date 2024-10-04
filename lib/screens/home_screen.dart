@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                       Color(0xFF405E69),
                       Color(0xFF73A9BD),
                     ],
-                    stops: [0.10, 0.63, 1.0], // Porcentajes del degradado
+                    stops: [0.10, 0.83, 1.0], // Porcentajes del degradado
                     begin: Alignment.topCenter, // Punto inicial (arriba)
                     end: Alignment.bottomCenter, // Punto final (abajo)
                   ),
@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                       Color(0xFF405E69),
                       Color(0xFF73A9BD),
                     ],
-                    stops: [0.1, 0.63, 1], // Porcentajes del degradado
+                    stops: [0.1, 0.83, 1], // Porcentajes del degradado
                     begin: Alignment.topCenter, // Punto inicial (arriba)
                     end: Alignment.bottomCenter, // Punto final (abajo)
                   ),

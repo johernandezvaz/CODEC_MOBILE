@@ -318,7 +318,7 @@ class _DatosScreenState extends State<DatosScreen> {
                                 ],
                                 stops: [
                                   0.10,
-                                  0.63,
+                                  0.83,
                                   1.0
                                 ], // Porcentajes del degradado
                                 begin: Alignment
